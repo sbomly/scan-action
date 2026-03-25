@@ -1,0 +1,55 @@
+name: 'SBOMly Scan'
+description: 'Generate SBOM, scan for vulnerabilities, and upload results to GitHub Code Scanning'
+author: 'SBOMly'
+
+branding:
+  icon: 'shield'
+  color: 'purple'
+
+inputs:
+  api-key:
+    description: 'SBOMly API key (from my.sbomly.com profile)'
+    required: true
+  api-url:
+    description: 'SBOMly API base URL'
+    required: false
+    default: 'https://my.sbomly.com'
+  manifest-path:
+    description: 'Path to manifest file (auto-detected if not specified)'
+    required: false
+    default: ''
+  fail-on-severity:
+    description: 'Fail the workflow if vulnerabilities of this severity or higher are found (critical, high, medium, low, none)'
+    required: false
+    default: 'none'
+
+outputs:
+  scan-id:
+    description: 'SBOMly scan ID'
+  vulnerability-count:
+    description: 'Total number of vulnerabilities found'
+  critical-count:
+    description: 'Number of critical vulnerabilities'
+  high-count:
+    description: 'Number of high vulnerabilities'
+  sarif-file:
+    description: 'Path to generated SARIF file'
+
+runs:
+  using: 'composite'
+  steps:
+    - name: Run SBOMly Scan
+      shell: bash
+      env:
+        SBOMLY_API_KEY: ${{ inputs.api-key }}
+        SBOMLY_API_URL: ${{ inputs.api-url }}
+        SBOMLY_MANIFEST_PATH: ${{ inputs.manifest-path }}
+        SBOMLY_FAIL_ON_SEVERITY: ${{ inputs.fail-on-severity }}
+      run: bash ${{ github.action_path }}/scan.sh
+
+    - name: Upload SARIF to GitHub Code Scanning
+      if: always() && hashFiles('sbomly-results.sarif') != ''
+      uses: github/codeql-action/upload-sarif@v3
+      with:
+        sarif_file: sbomly-results.sarif
+        category: sbomly
