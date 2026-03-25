@@ -49,6 +49,7 @@ runs:
 
     - name: Upload SARIF to GitHub Code Scanning
       if: always() && hashFiles('sbomly-results.sarif') != ''
+      continue-on-error: true
       uses: github/codeql-action/upload-sarif@v3
       with:
         sarif_file: sbomly-results.sarif
