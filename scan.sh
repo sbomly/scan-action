@@ -210,7 +210,7 @@ if [[ -n "${GITHUB_STEP_SUMMARY:-}" ]]; then
 | Low | $LOW |
 | EOL Components | $EOL_COUNT |
 
-[View full report](https://my.sbomly.com)
+[SBOMly](https://my.sbomly.com) | [Scan ID: ${SCAN_ID}](https://my.sbomly.com)
 EOF
 fi
 
