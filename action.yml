@@ -13,7 +13,7 @@ inputs:
   api-url:
     description: 'SBOMly API base URL'
     required: false
-    default: 'https://my.sbomly.com'
+    default: 'https://api.sbomly.com'
   manifest-path:
     description: 'Path to manifest file (auto-detected if not specified)'
     required: false

@@ -2,7 +2,7 @@
 # SBOMly GitHub Action - Scan manifest, download SARIF, set outputs
 set -euo pipefail
 
-API_URL="${SBOMLY_API_URL:-https://my.sbomly.com}"
+API_URL="${SBOMLY_API_URL:-https://api.sbomly.com}"
 API_KEY="${SBOMLY_API_KEY:?Error: SBOMLY_API_KEY is required}"
 MANIFEST_PATH="${SBOMLY_MANIFEST_PATH:-}"
 FAIL_ON="${SBOMLY_FAIL_ON_SEVERITY:-none}"
