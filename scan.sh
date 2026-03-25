@@ -91,19 +91,22 @@ MANIFEST=$(find_manifest)
 MANIFEST_TYPE=$(detect_type "$MANIFEST")
 echo "Manifest: $MANIFEST (type: $MANIFEST_TYPE)"
 
-MANIFEST_CONTENT=$(cat "$MANIFEST")
-
 # Submit scan
 log "Submitting scan to SBOMly"
+
+# Write manifest to temp file to avoid argument-too-long for large lock files
+TMPFILE=$(mktemp)
+jq -n --rawfile content "$MANIFEST" --arg type "$MANIFEST_TYPE" \
+    '{manifest_content: $content, manifest_type: $type}' > "$TMPFILE"
+
 SCAN_RESPONSE=$(curl -s -w "\n%{http_code}" \
     -X POST "${API_URL}/api/v1/manifest/upload" \
     -H "Content-Type: application/json" \
     -H "X-API-Key: ${API_KEY}" \
-    -d "$(jq -n \
-        --arg content "$MANIFEST_CONTENT" \
-        --arg type "$MANIFEST_TYPE" \
-        '{manifest_content: $content, manifest_type: $type}')" \
+    -d @"$TMPFILE" \
     2>&1) || true
+
+rm -f "$TMPFILE"
 
 HTTP_CODE=$(echo "$SCAN_RESPONSE" | tail -1)
 BODY=$(echo "$SCAN_RESPONSE" | sed '$d')
